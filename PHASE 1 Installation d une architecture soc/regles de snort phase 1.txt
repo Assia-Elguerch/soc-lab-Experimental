@@ -1,0 +1,100 @@
+-----------------------------------------
+6) CONFIGURATION ET RÈGLES SNORT (LAB 10.10.10.0/24)
+-----------------------------------------
+
+Contexte :
+Chaque VM a 2 adapters :
+- Adapter 1 : NAT (internet / updates)
+- Adapter 2 : Host-Only (réseau du lab)
+
+Réseau du lab (Host-Only) : 10.10.10.0/24
+=> Snort doit protéger ce réseau.
+
+-----------------------------------------
+A) Identifier l’interface Host-Only
+-----------------------------------------
+
+Sur la machine SOC :
+
+ip a
+
+Repérer l’interface qui a une IP 10.10.10.X
+(exemple : ens33 / ens34 / eth1 etc.)
+
+Note : on utilisera cette interface dans la commande Snort.
+
+-----------------------------------------
+B) Modifier snort.conf (HOME_NET + règles locales)
+-----------------------------------------
+
+sudo nano /etc/snort/snort.conf
+
+1) Définir HOME_NET (réseau protégé)
+Chercher la ligne HOME_NET puis mettre :
+
+ipvar HOME_NET 10.10.10.0/24
+
+2) Vérifier que les règles locales sont incluses
+Assurer que cette ligne n’est pas commentée :
+
+include $RULE_PATH/local.rules
+
+-----------------------------------------
+C) Ajouter les règles dans local.rules
+-----------------------------------------
+
+sudo nano /etc/snort/rules/local.rules
+
+RÈGLE 1 — ICMP (PING) vers le réseau interne
+alert icmp any any -> $HOME_NET any (msg:"ICMP detected in HOME_NET"; sid:1000001; rev:1;)
+
+RÈGLE 2 — HTTP (port 80) vers le réseau interne
+alert tcp any any -> $HOME_NET 80 (msg:"HTTP access detected in HOME_NET"; sid:1000002; rev:1;)
+
+RÈGLE 3 — SSH (port 22) vers le réseau interne
+alert tcp any any -> $HOME_NET 22 (msg:"SSH connection detected in HOME_NET"; sid:1000003; rev:1;)
+
+-----------------------------------------
+D) Tester la configuration Snort
+-----------------------------------------
+
+sudo snort -T -c /etc/snort/snort.conf
+
+Résultat attendu :
+Snort successfully validated the configuration
+
+-----------------------------------------
+E) Lancer Snort (sur l’interface Host-Only 10.10.10.X)
+-----------------------------------------
+
+IMPORTANT :
+Utiliser l’interface qui porte l’IP 10.10.10.X (Host-Only).
+
+Exemple :
+sudo snort -A console -q -c /etc/snort/snort.conf -i <INTERFACE_HOST_ONLY>
+
+(Exemple d’interface : ens34 ou eth1)
+
+-----------------------------------------
+F) Tester les règles (depuis la machine Attacker)
+-----------------------------------------
+
+1) ICMP (PING)
+ping 10.10.10.<IP_VICTIM>
+
+2) HTTP
+curl http://10.10.10.<IP_VICTIM>
+
+3) SSH
+ssh fakeuser@10.10.10.<IP_VICTIM>
+
+Les alertes doivent apparaître dans la console Snort.
+
+-----------------------------------------
+NOTE IMPORTANTE
+-----------------------------------------
+- Le NAT sert juste à internet (install / update)
+- Le Host-Only (10.10.10.0/24) est le réseau du laboratoire SOC
+- HOME_NET doit toujours correspondre au réseau du lab
+
+-----------------------------------------

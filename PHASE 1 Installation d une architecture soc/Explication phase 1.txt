@@ -1,0 +1,78 @@
+
+--------------------------------
+1. PRÉSENTATION DU PROJET
+--------------------------------
+Le projet consiste à mettre en place un petit laboratoire SOC
+(Security Operations Center) pour détecter et analyser des attaques
+réelles dans un environnement contrôlé.
+
+Le SOC permet :
+- de détecter des attaques,
+- d’analyser les événements,
+- et plus tard de réagir avec une contre-mesure.
+
+--------------------------------
+2. MACHINES DU LABORATOIRE
+--------------------------------
+
+1) Machine SOC
+IP : 192.168.1.130
+
+Rôle :
+- Serveur central de sécurité
+- Wazuh (collecte et analyse des logs)
+- Snort (détection des attaques réseau)
+- Plus tard : script Python de corrélation
+
+2) Machine Victime
+IP : 192.168.1.129
+
+Rôle :
+- Machine cible des attaques
+- Services actifs : SSH et HTTP
+- Agent Wazuh installé
+- Envoie les logs vers la machine SOC
+
+3) Machine Attaquant
+IP : 192.168.1.128
+
+Rôle :
+- Simulation d’attaques contrôlées
+- Génère du trafic SSH, HTTP et ICMP
+- Plus tard : script Python de simulation d’attaque
+
+--------------------------------
+3. CE QUI A ÉTÉ RÉALISÉ
+--------------------------------
+- Création de l’infrastructure complète
+- Configuration du réseau et des adresses IP
+- Installation et configuration de Wazuh
+- Déploiement de l’agent Wazuh sur la machine victime
+- Installation et test de Snort
+- Tests réels :
+  - Tentatives de connexion SSH
+  - Ping ICMP
+  - Requêtes HTTP
+- Vérification que les alertes apparaissent bien dans Wazuh
+
+Tout fonctionne correctement.
+
+--------------------------------
+4. PROCHAINE ÉTAPE
+--------------------------------
+Nous allons travailler sur deux scripts Python :
+
+1) Script Python de simulation d’attaque
+   - Lance des actions simples (SSH, HTTP, ICMP)
+   - Sert à générer des événements pour le SOC
+
+2) Script Python de corrélation
+   - Lit les logs de Wazuh et de Snort
+   - Analyse les événements
+   - Identifie des attaques plus complexes
+
+une contre-mesure (pfSense) sera ajoutée
+pour bloquer les attaques détectées.
+
+
+--------------------------------

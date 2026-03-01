@@ -1,0 +1,116 @@
+=========================================
+SOC LAB – COMMANDES ESSENTIELLES (SIMPLE)
+=========================================
+
+Objectif : Reproduire le laboratoire SOC du projet.
+Réseau ADAPTER NAT : 192.168.1.0/24
+Reseau ADAPTER HOST ONLY : 10.10.10.0/24
+IP  :
+- Attacker : 192.168.1.128 10.10.10.128
+- Victim   : 192.168.1.129 10.10.10.129
+- SOC      : 192.168.1.130 10.10.10.130
+
+-----------------------------------------
+1) MACHINE SOC (192.168.1.130)
+Rôle : Wazuh + Snort + (plus tard) corrélation Python
+-----------------------------------------
+
+A) Mise à jour
+sudo apt update && sudo apt upgrade -y
+
+B) Installer Wazuh (all-in-one)
+curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash wazuh-install.sh -a
+
+C) Vérifier que Wazuh tourne
+systemctl status wazuh-manager
+systemctl status wazuh-indexer
+systemctl status wazuh-dashboard
+
+D) Accès Wazuh (depuis navigateur)
+https://192.168.1.130:443
+
+admin et mdp sont afficher a la fin d installation
+
+E) Installer Snort
+sudo apt install -y snort
+
+F) Vérifier Snort
+snort -V
+sudo systemctl status snort
+
+G) Voir les alertes Snort (fichier log)
+ls /var/log/snort/
+
+-----------------------------------------
+2) MACHINE VICTIM (192.168.1.129)
+Rôle : Cible (ICMP + SSH + HTTP) + Agent Wazuh
+-----------------------------------------
+
+A) Mise à jour
+sudo apt update && sudo apt upgrade -y
+
+B) Installer SSH et HTTP
+sudo apt install -y openssh-server apache2 
+
+C) Vérifier services
+systemctl status ssh
+systemctl status apache2
+systemctl status http
+
+D) Tester HTTP local
+curl http://localhost
+
+E) Installer Wazuh Agent (commande simple)
+wget https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.14.2-1_amd64.deb
+sudo WAZUH_MANAGER='192.168.1.130' WAZUH_AGENT_NAME='ubuntu_machine_victime' dpkg -i ./wazuh-agent_4.14.2-1_amd64.deb
+
+F) Activer l’agent
+sudo systemctl daemon-reload
+sudo systemctl enable wazuh-agent
+sudo systemctl start wazuh-agent
+
+G) Vérifier agent
+systemctl status wazuh-agent
+
+-----------------------------------------
+3) MACHINE ATTACKER (192.168.1.128)
+Rôle : Simulation d’attaques contrôlées
+-----------------------------------------
+
+A) Test SSH (génère alertes Wazuh)
+ssh fakeuser@192.168.1.129
+(mettre un mauvais mot de passe 2-3 fois)
+
+B) Test ICMP (ping )
+ping -c 5 192.168.1.129
+
+C) Test HTTP (génère trafic web abnormal )
+for i in {1..10}; do curl -s http://192.168.1.129 >/dev/null; done
+
+
+-----------------------------------------
+4) COMMENT VÉRIFIER QUE TOUT MARCHE ?
+-----------------------------------------
+
+A) Sur SOC : vérifier que Wazuh voit l’agent
+(ouvrir le dashboard Wazuh)
+-> agent doit être "Connected"
+
+B) Sur SOC : voir les alertes Wazuh en fichier JSON
+sudo tail -n 30 /var/ossec/logs/alerts/alerts.json
+
+C) Sur SOC : voir les alertes Snort pendant les tests
+sudo tail -f /var/log/snort/alert
+
+Si vous voyez des lignes (SSH / scan / etc.), alors le lab est OK.
+
+-----------------------------------------
+5) PROCHAINE ÉTAPE DU PROJET
+-----------------------------------------
+- Script Python 1 : simulation d’attaque (sur Attacker)
+- Script Python 2 : corrélation (sur SOC)
+- Puis : pfSense comme contre-mesure (blocage IP)
+
+=========================================
+FIN DU FICHIER
+=========================================
