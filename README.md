@@ -1,4 +1,4 @@
-<div align="center">
+
 
 # 🛡️  Experimental SOC— Intelligent Security Event Detection & Correlation
 
@@ -15,7 +15,7 @@
 
 > *"Detection alone is not enough — correlation, prevention, and automation are the pillars of a modern SOC."*
 
-</div>
+
 
 ---
 
@@ -463,8 +463,7 @@ Bachelor CISIA — Cybersécurité, Ingénierie des Systèmes et Intelligence Ar
 
 **Academic Year:** 2025 – 2026
 
-<div align="center">
+
 [![EST](https://img.shields.io/badge/EST-Université%20Hassan%20II-003087?style=for-the-badge)](https://est.uh2c.ma)
 [![CISIA](https://img.shields.io/badge/Bachelor-CISIA-CC0000?style=for-the-badge)](https://est.uh2c.ma)
 
-</div>
