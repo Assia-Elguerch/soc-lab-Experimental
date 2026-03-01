@@ -33,8 +33,6 @@
 - [PfSense Firewall (Active Defense)](#-pfsense-firewall-active-defense)
 - [Results & Validation](#-results--validation)
 - [Screenshots](#-screenshots)
-- [Authors](#-authors)
-
 ---
 
 ## 🔍 Overview
