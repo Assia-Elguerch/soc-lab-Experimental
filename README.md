@@ -1,6 +1,6 @@
 
 
-# 🛡️  Experimental SOC— Intelligent Security Event Detection & Correlation
+#   Experimental SOC— Intelligent Security Event Detection & Correlation
 
 **A fully virtualized Security Operations Center built from scratch**
 
